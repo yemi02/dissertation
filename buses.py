@@ -1,6 +1,6 @@
 import pandapower as pp
 import pandas as pd
-from substation import NGET_BUSES
+from substation import NGET_SUBSTATIONS
 
 def create_buses(net):
     """
@@ -35,7 +35,7 @@ def create_buses(net):
     for bus in buses:
         substation = bus[:4] # gets the substation code
         
-        if substation in NGET_BUSES:
+        if substation in NGET_SUBSTATIONS:
             
             # create bus
             bus_idx = pp.create_bus(net, vn_kv=400, name=bus)
