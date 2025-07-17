@@ -4,7 +4,7 @@ from substations import NGET_SUBSTATIONS, SHE_SUBSTATIONS, SPT_SUBSTATIONS, OFTO
 from buses import create_buses
 from lines import create_lines
 from transformers import create_transformers
-
+from loads import create_loads
 
 
 # Creating Empty Network
@@ -19,4 +19,7 @@ create_lines(net, NGET_bus_lookup, SHE_BUS, SPT_BUS, OFTO_BUS)
 # creating Transformers
 create_transformers(net, NGET_bus_lookup, SHE_BUS, SPT_BUS, OFTO_BUS)
 
-print(net)
+# Creating Demands
+create_loads(net, NGET_bus_lookup)
+
+print(net) 
