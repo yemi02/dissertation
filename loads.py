@@ -14,6 +14,8 @@ def create_loads(net, NGET_bus_lookup):
     SPT_LOAD_BUS = {}
     OFTO_LOAD_BUS = {}
     NONEXISTENT_LOAD_BUS = {}
+    total_NGET_connected = 0
+    total_NGET_load_not_connected = 0
     total_SHE_load = 0
     total_SPT_load = 0
     total_OFTO_load = 0
@@ -27,8 +29,10 @@ def create_loads(net, NGET_bus_lookup):
         if bus[:4] in NGET_SUBSTATIONS:
             if bus in NGET_bus_lookup:
                 pp.create_load(net, NGET_bus_lookup[bus], p_mw)
+                total_NGET_connected += p_mw
             else:
                 NGET_LOAD_BUS_NOT_EXISTING.add(bus)
+                total_NGET_load_not_connected += p_mw
 
         elif bus[:4] in SHE_SUBSTATIONS:
             SHE_LOAD_BUS[bus] = p_mw
@@ -45,5 +49,6 @@ def create_loads(net, NGET_bus_lookup):
             NONEXISTENT_LOAD_BUS[bus] = p_mw
             total_load_missing += p_mw
 
-    print(total_SHE_load, total_SPT_load, total_OFTO_load, total_load_missing)
+    print("nget connected", total_NGET_connected, "nget not connected", total_NGET_load_not_connected, "she", total_SHE_load, "spt", total_SPT_load, "ofto", total_OFTO_load, "missing", total_load_missing)
+    
     print(len(NGET_LOAD_BUS_NOT_EXISTING), len(SHE_LOAD_BUS), len(SPT_LOAD_BUS), len(OFTO_LOAD_BUS), len(NONEXISTENT_LOAD_BUS))

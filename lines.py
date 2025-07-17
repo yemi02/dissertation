@@ -32,6 +32,10 @@ def create_lines(net, NGET_bus_lookup, SHE_BUS, SPT_BUS, OFTO_BUS):
             length_km = df.at[idx, "OHL Length (km)"]
         elif circuit_type == "Cable":
             length_km = df.at[idx, "Cable Length (km)"]
+            if (length_km == 0):
+                length_km = 0.001
+            if (x_pu == 0):
+                x_pu = 0.001
         elif circuit_type in ["Zero Length", "Series Reactor", "Series Capacitor", "SSSC"]:
             length_km = 0.001
             if circuit_type == "Zero Length":
