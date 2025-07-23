@@ -1,6 +1,5 @@
 import pandapower as pp
 import pandas as pd
-from substations import NGET_SUBSTATIONS, SHE_SUBSTATIONS, SPT_SUBSTATIONS, OFTO_SUBSTATIONS
 from buses import create_buses
 from lines import create_lines
 from transformers import create_transformers

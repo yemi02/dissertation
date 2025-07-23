@@ -10,7 +10,7 @@ def convert_x_pu_from_old_to_new(x_old_pu, s_base_new):
     x_new_pu = x_old_pu * (s_base_new/s_base_old)
     return x_new_pu 
 
-# === Line Creation Function ===
+# === Transformer Creation Function ===
 
 def create_transformers(net, NGET_bus_lookup, SHE_BUS, SPT_BUS, OFTO_BUS):
     df = pd.read_excel("ETYS_B.xlsx", sheet_name="B-3-1c", skiprows=1)
