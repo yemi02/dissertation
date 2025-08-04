@@ -3,9 +3,12 @@ import pandas as pd
 from rapidfuzz import process, fuzz
 import re
 
-# Constants and helpers
+# Constants
 NETWORK_SHEETS = ["B-1-1a", "B-1-1b", "B-1-1c", "B-1-1d"]
 
+# -----------------
+# Helper Functions
+# -----------------
 def clean_name(name):
     if not isinstance(name, str):
         return ""
@@ -27,28 +30,28 @@ def map_to_lcoe_category(plant_type_str):
         return "Other"
     pt = plant_type_str.lower()
 
-    
-    if "wind" in pt:
-        return "Wind"
-    if "pv array" in pt or "solar" in pt:
-        return "Solar PV"
-    if "nuclear" in pt:
-        return "Nuclear"
-    if "hydro" in pt:
-        return "Hydro"
-    if "pump storage" in pt or "pumped storage" in pt:
-        return "Pumped Storage"
-    if "ccgt" in pt:
-        return "CCGT"
-    if "ocgt" in pt:
-        return "OCGT"
-    if "biomass" in pt or "thermal" in pt:
-        return "Biomass"
     if "coal" in pt:
         return "Coal"
-    if "energy storage" in pt or "battery storage" in pt or "storage" in pt:
+    elif "wind" in pt:
+        return "Wind"
+    elif "pv array" in pt or "solar" in pt:
+        return "Solar PV"
+    elif "nuclear" in pt:
+        return "Nuclear"
+    elif "hydro" in pt:
+        return "Hydro"
+    elif "pump storage" in pt or "pumped storage" in pt:
+        return "Pumped Storage"
+    elif "ccgt" in pt:
+        return "CCGT"
+    elif "ocgt" in pt:
+        return "OCGT"
+    elif "biomass" in pt or "thermal" in pt:
+        return "Biomass"
+    elif "energy storage" in pt or "battery storage" in pt or "storage" in pt:
         return "Battery Storage"
-    return "Other"
+    else:
+        return "Other"
 
 def get_best_match(name, site_names_clean):
     match = process.extractOne(name, site_names_clean, scorer=fuzz.WRatio)
@@ -67,27 +70,37 @@ def load_substations():
     sub_df = sub_df.drop_duplicates(subset=["Cleaned Site"])
     return sub_df
 
+# -----------------
+# Main Generator Creation
+# -----------------
 def create_gens(net, NGET_bus_lookup, substation_group):
     total_generation_connected = 0
+
+    # Load TEC Register
     gen_df = pd.read_excel("ETYS_documents/ETYS_F.xlsx", sheet_name="TEC Register", skiprows=1)
     gen_df = gen_df.dropna(subset=["Project Status", "HOST TO"])
     gen_df["Project Status"] = gen_df["Project Status"].str.strip().str.lower()
     gen_df["HOST TO"] = gen_df["HOST TO"].str.strip().str.upper()
 
+    # Filter only built NGET generators
     gen_df = gen_df[
         (gen_df["Project Status"] == "built") &
         (gen_df["HOST TO"] == "NGET")
     ].copy()
 
+    # Clean names and map categories
     gen_df["Cleaned Site"] = gen_df["Connection Site"].apply(clean_name)
     gen_df["LCOE Category"] = gen_df["Plant Type"].apply(map_to_lcoe_category)
 
+    # Load substations and match
     sub_df = load_substations()
     site_names_clean = sub_df["Cleaned Site"].tolist()
+    gen_df["Matched Site"], gen_df["Match Score"] = zip(*gen_df["Cleaned Site"].map(
+        lambda x: get_best_match(x, site_names_clean)
+    ))
 
-    gen_df["Matched Site"], gen_df["Match Score"] = zip(*gen_df["Cleaned Site"].map(lambda x: get_best_match(x, site_names_clean)))
-
-    merged_df = pd.merge(
+    # Merge generators with substations
+    matched_df = pd.merge(
         gen_df,
         sub_df,
         left_on="Matched Site",
@@ -96,16 +109,13 @@ def create_gens(net, NGET_bus_lookup, substation_group):
         suffixes=("", "_sub")
     )
 
-    matched_df = merged_df[["Connection Site", "Site Code", "Site Name", "MW Connected", "Match Score", "LCOE Category"]].copy()
+    # Keep only needed columns — each row is ONE generator
+    final_matched = matched_df[[
+        "Connection Site", "Site Code", "Site Name",
+        "MW Connected", "Match Score", "LCOE Category"
+    ]].copy()
 
-    final_matched = matched_df.groupby("Site Code").agg({
-        "MW Connected": "sum",
-        "Site Name": "first",
-        "LCOE Category": lambda x: x.mode().iloc[0] if not x.mode().empty else "Other",
-        "Match Score": "max"
-    }).reset_index()
-
-    # Fixed costs €/MWh as per your provided mapping
+    # Fixed costs €/MWh
     fixed_costs = {
         "Wind": 10,
         "Solar PV": 10,
@@ -119,19 +129,18 @@ def create_gens(net, NGET_bus_lookup, substation_group):
         "Coal": 80,
         "Battery Storage": 100
     }
-
     final_matched["Fixed Cost"] = final_matched["LCOE Category"].map(fixed_costs).fillna(1000)
 
-    # Clear poly_cost to avoid duplicates
+    # Clear old poly_cost
     if not net.poly_cost.empty:
         net.poly_cost.drop(net.poly_cost.index, inplace=True)
 
+    # Loop through each generator row
     for _, row in final_matched.iterrows():
         site_code = row["Site Code"]
         total_mw = row["MW Connected"]
         fixed_cost = row["Fixed Cost"]
-
-        total_generation_connected += total_mw
+        gen_type = row["LCOE Category"]
 
         if site_code not in substation_group:
             continue
@@ -141,28 +150,26 @@ def create_gens(net, NGET_bus_lookup, substation_group):
             continue
 
         mw_per_bus = total_mw / len(buses)
+        total_generation_connected += total_mw
 
         for bus_name in buses:
             if bus_name in NGET_bus_lookup:
                 bus_idx = NGET_bus_lookup[bus_name]
 
-                gen_type = row["LCOE Category"]
+                # Create generator
+                pp.create_gen(
+                    net, bus=bus_idx, p_mw=0.0, min_p_mw=0.0,
+                    max_p_mw=mw_per_bus, name=gen_type
+                )
 
-                # Create generator with max_p_mw = allocated, initial p_mw = 0
-                pp.create_gen(net, bus=bus_idx, p_mw=0.0, min_p_mw=0.0, max_p_mw=mw_per_bus, name=gen_type)
-
+                # Add cost
                 gen_idx = net.gen.index[-1]
-
-                # Assign fixed cost
-                pp.create_poly_cost(net, element=gen_idx, et='gen',
-                                    cp0_eur=0.0,
-                                    cp1_eur_per_mw=fixed_cost,
-                                    cp2_eur_per_mw2=0.0)
-            else:
-                continue
+                pp.create_poly_cost(
+                    net, element=gen_idx, et='gen',
+                    cp0_eur=0.0,
+                    cp1_eur_per_mw=fixed_cost,
+                    cp2_eur_per_mw2=0.0
+                )
 
     print("Generator creation complete.")
-    print("Total generation connected in network:", 
-    total_generation_connected, "MW")
-
-    
+    print("Total generation connected in network:", total_generation_connected, "MW")
