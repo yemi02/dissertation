@@ -1,0 +1,32 @@
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Byte-compiled / optimized / DLL files
+*.pyc
+*.pyo
+*.pyd
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Other common folders to ignore
+*.log
+*.sqlite3
+*.db
+
+# Ignore VSCode settings
+.vscode/
+
+# Ignore Python virtual environments
+venv/
+env/
