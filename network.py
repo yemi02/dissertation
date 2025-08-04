@@ -38,7 +38,7 @@ net.load['controllable'] = False
 net.gen['min_p_mw'] = 0
 
 # Apply load scaling
-net.load.loc[:, 'p_mw'] *= 1.07
+net.load.loc[:, 'p_mw'] *= 0.8
 
 # Ensure we still have a slack or generators
 if net.ext_grid.empty and net.gen.empty:

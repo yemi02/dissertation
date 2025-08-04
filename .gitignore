@@ -19,6 +19,9 @@ dist/
 *.egg-info/
 .eggs/
 
+# Results folder
+results/
+
 # Other common folders to ignore
 *.log
 *.sqlite3

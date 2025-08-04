@@ -24,25 +24,30 @@ def clean_name(name):
 
 def map_to_lcoe_category(plant_type_str):
     if not isinstance(plant_type_str, str):
-        return "Unknown"
+        return "Other"
     pt = plant_type_str.lower()
-    if "energy storage" in pt or "storage" in pt:
-        return "Battery Storage"
-    gas_keywords = ["ccgt", "ocgt", "gas reciprocating", "chp", "advanced gas turbine", "agt", "oil & agt"]
-    if any(keyword in pt for keyword in gas_keywords):
-        return "Gas"
-    if "nuclear" in pt:
-        return "Nuclear"
+
+    
     if "wind" in pt:
         return "Wind"
     if "pv array" in pt or "solar" in pt:
         return "Solar PV"
-    if "hydro" in pt or "pump storage" in pt or "pumped storage" in pt:
-        return "Hydro & Pumped"
+    if "nuclear" in pt:
+        return "Nuclear"
+    if "hydro" in pt:
+        return "Hydro"
+    if "pump storage" in pt or "pumped storage" in pt:
+        return "Pumped Storage"
+    if "ccgt" in pt:
+        return "CCGT"
+    if "ocgt" in pt:
+        return "OCGT"
     if "biomass" in pt or "thermal" in pt:
-        return "Biomass & Thermal"
-    if "reactive compensation" in pt or "demand" in pt or "waste" in pt:
-        return "Other/Non-Gen"
+        return "Biomass"
+    if "coal" in pt:
+        return "Coal"
+    if "energy storage" in pt or "battery storage" in pt or "storage" in pt:
+        return "Battery Storage"
     return "Other"
 
 def get_best_match(name, site_names_clean):
@@ -96,27 +101,30 @@ def create_gens(net, NGET_bus_lookup, substation_group):
     final_matched = matched_df.groupby("Site Code").agg({
         "MW Connected": "sum",
         "Site Name": "first",
-        "LCOE Category": lambda x: x.mode().iloc[0] if not x.mode().empty else "Unknown",
+        "LCOE Category": lambda x: x.mode().iloc[0] if not x.mode().empty else "Other",
         "Match Score": "max"
     }).reset_index()
 
-    # LCOE cost mappings (€/MWh)
+    # Fixed costs €/MWh as per your provided mapping
     fixed_costs = {
-        "Battery Storage": 100,
-        "Gas": 50,
-        "Nuclear": 20,
         "Wind": 10,
         "Solar PV": 10,
-        "Hydro & Pumped": 30,
-        "Biomass & Thermal": 60,
+        "Nuclear": 20,
+        "Hydro": 30,
+        "Pumped Storage": 35,
+        "CCGT": 50,
+        "OCGT": 55,
+        "Biomass": 60,
         "Other": 70,
-        "Other/Non-Gen": 80
+        "Coal": 80,
+        "Battery Storage": 100
     }
 
     final_matched["Fixed Cost"] = final_matched["LCOE Category"].map(fixed_costs).fillna(1000)
 
     # Clear poly_cost to avoid duplicates
-    net.poly_cost.drop(net.poly_cost.index, inplace=True)
+    if not net.poly_cost.empty:
+        net.poly_cost.drop(net.poly_cost.index, inplace=True)
 
     for _, row in final_matched.iterrows():
         site_code = row["Site Code"]
@@ -138,12 +146,14 @@ def create_gens(net, NGET_bus_lookup, substation_group):
             if bus_name in NGET_bus_lookup:
                 bus_idx = NGET_bus_lookup[bus_name]
 
+                gen_type = row["LCOE Category"]
+
                 # Create generator with max_p_mw = allocated, initial p_mw = 0
-                pp.create_gen(net, bus=bus_idx, p_mw=0.0, min_p_mw=0.0, max_p_mw=mw_per_bus)
+                pp.create_gen(net, bus=bus_idx, p_mw=0.0, min_p_mw=0.0, max_p_mw=mw_per_bus, name=gen_type)
 
                 gen_idx = net.gen.index[-1]
 
-                # Assign cost using official API to avoid duplicates
+                # Assign fixed cost
                 pp.create_poly_cost(net, element=gen_idx, et='gen',
                                     cp0_eur=0.0,
                                     cp1_eur_per_mw=fixed_cost,
@@ -152,4 +162,7 @@ def create_gens(net, NGET_bus_lookup, substation_group):
                 continue
 
     print("Generator creation complete.")
-    print("Total generation connected in network:", total_generation_connected, "MW")
+    print("Total generation connected in network:", 
+    total_generation_connected, "MW")
+
+    
