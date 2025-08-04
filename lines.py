@@ -86,3 +86,4 @@ def create_lines(net, NGET_bus_lookup, SHE_BUS, SPT_BUS, OFTO_BUS):
             c_nf_per_km=0.0,
             max_i_ka=mva_rating
         )
+    print("Line creation complete")

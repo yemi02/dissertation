@@ -53,6 +53,6 @@ def create_transformers(net, NGET_bus_lookup, SHE_BUS, SPT_BUS, OFTO_BUS):
             xft_pu=convert_x_pu_from_old_to_new(x_pu_old, mva_rating),
             sn_mva=mva_rating,
         )
-            
+    print("Transformer creation complete.")            
 
 
