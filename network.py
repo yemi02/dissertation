@@ -32,10 +32,6 @@ pp.to_excel(net, os.path.join("results", "network_v0.xlsx"))
 # --- Remove all but largest island ---
 net = keep_largest_island(net)
 
-# --- Configure controllable elements ---
-net.gen['controllable'] = True
-net.load['controllable'] = False
-net.gen['min_p_mw'] = 0
 
 # Apply load scaling
 net.load.loc[:, 'p_mw'] *= 0.8

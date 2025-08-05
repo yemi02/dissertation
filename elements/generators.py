@@ -159,7 +159,7 @@ def create_gens(net, NGET_bus_lookup, substation_group):
                 # Create generator
                 pp.create_gen(
                     net, bus=bus_idx, p_mw=0.0, min_p_mw=0.0,
-                    max_p_mw=mw_per_bus, name=gen_type
+                    max_p_mw=mw_per_bus, name=gen_type, controllable=True
                 )
 
                 # Add cost
