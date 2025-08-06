@@ -74,7 +74,6 @@ def load_substations():
 # Main Generator Creation
 # -----------------
 def create_gens(net, NGET_bus_lookup, substation_group):
-    total_generation_connected = 0
 
     # Load TEC Register
     gen_df = pd.read_excel("ETYS_documents/ETYS_F.xlsx", sheet_name="TEC Register", skiprows=1)
@@ -121,13 +120,13 @@ def create_gens(net, NGET_bus_lookup, substation_group):
         "Solar PV": 10,
         "Nuclear": 20,
         "Hydro": 30,
-        "Pumped Storage": 35,
+        "Pumped Storage": 40,
         "CCGT": 50,
         "OCGT": 55,
-        "Biomass": 60,
+        "Biomass": 45,
         "Other": 70,
         "Coal": 80,
-        "Battery Storage": 100
+        "Battery Storage": 35
     }
     final_matched["Fixed Cost"] = final_matched["LCOE Category"].map(fixed_costs).fillna(1000)
 
@@ -150,7 +149,6 @@ def create_gens(net, NGET_bus_lookup, substation_group):
             continue
 
         mw_per_bus = total_mw / len(buses)
-        total_generation_connected += total_mw
 
         for bus_name in buses:
             if bus_name in NGET_bus_lookup:
@@ -172,4 +170,3 @@ def create_gens(net, NGET_bus_lookup, substation_group):
                 )
 
     print("Generator creation complete.")
-    print("Total generation connected in network:", total_generation_connected, "MW")

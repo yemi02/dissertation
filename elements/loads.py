@@ -23,8 +23,6 @@ def create_loads(net, NGET_bus_lookup, substation_group):
 
     load_per_substation = {substation: 0 for substation in NGET_SUBSTATIONS}
     NGET_LOAD_BUS_NOT_EXISTING = set()
-    total_NGET_connected = 0
-    total_NGET_load_not_connected = 0
     
 
     df = pd.read_excel("ETYS_documents/ETYS_G.xlsx", sheet_name="demand data 2023", skiprows=9)
@@ -36,15 +34,12 @@ def create_loads(net, NGET_bus_lookup, substation_group):
         if substation in NGET_SUBSTATIONS:
             if bus in NGET_bus_lookup:
                 pp.create_load(net, NGET_bus_lookup[bus], p_mw, controllable=False)
-                total_NGET_connected += p_mw
             elif substation in load_per_substation:
 
                 load_per_substation[substation] += p_mw
-                total_NGET_connected += p_mw
                 
             else:
                 NGET_LOAD_BUS_NOT_EXISTING.add(bus)
-                total_NGET_load_not_connected += p_mw
 
     # Distirbuting load evenly among buses
 
@@ -66,5 +61,4 @@ def create_loads(net, NGET_bus_lookup, substation_group):
                 continue                  
 
     print("Load creation complete.")
-    print("Total load connected in network: ", total_NGET_connected, "MW")
     

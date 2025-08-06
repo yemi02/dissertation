@@ -43,7 +43,7 @@ def create_transformers(net, NGET_bus_lookup, SHE_BUS, SPT_BUS, OFTO_BUS):
             to_bus=to_bus,
             rft_pu=0,
             xft_pu=x_pu,
-            sn_mva=mva_rating,
+            sn_mva=mva_rating
         )
     print("Transformer creation complete.")            
 

@@ -85,6 +85,7 @@ def create_lines(net, NGET_bus_lookup, SHE_BUS, SPT_BUS, OFTO_BUS):
             r_ohm_per_km=0.0,
             x_ohm_per_km=convert_x_from_pu_to_ohm_per_km(x_pu, length_km),
             c_nf_per_km=0.0,
-            max_i_ka=ka_rating
+            max_i_ka=ka_rating,
+            max_loading_percent=100
         )
     print("Line creation complete")

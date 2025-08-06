@@ -8,6 +8,7 @@ from elements.lines import create_lines
 from elements.transformers import create_transformers
 from elements.loads import create_loads, group_bus_by_substation
 from elements.generators import create_gens
+from elements.interconnectors import create_interconnectors
 from utilities.island_cleanup import keep_largest_island 
 
 warnings.filterwarnings('ignore')
@@ -22,6 +23,7 @@ create_transformers(net, NGET_bus_lookup, SHE_BUS, SPT_BUS, OFTO_BUS)
 substation_group = group_bus_by_substation(NGET_bus_lookup)
 create_loads(net, NGET_bus_lookup, substation_group)
 create_gens(net, NGET_bus_lookup, substation_group)
+# create_interconnectors(net, NGET_bus_lookup, mode="import")
 
 # Slack Bus
 pp.create_ext_grid(net, SPT_BUS, vm_pu=1, name="SPT BUS")
@@ -34,7 +36,7 @@ net = keep_largest_island(net)
 
 
 # Apply load scaling
-net.load.loc[:, 'p_mw'] *= 0.8
+net.load.loc[:, 'p_mw']
 
 # Ensure we still have a slack or generators
 if net.ext_grid.empty and net.gen.empty:
