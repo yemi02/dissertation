@@ -4,14 +4,7 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
-def keep_largest_island(net):
-    """
-    Removes all islands except the largest from the network.
-    
-    Parameters: net (pandapowerNet): The pandapower network object to clean up.
-        
-    Returns: net (pandapowerNet): The modified network containing only the largest island.
-    """
+def run_dcopf(net):
     # Create the networkx graph
     graph = ppt.create_nxgraph(net)
 
@@ -29,5 +22,21 @@ def keep_largest_island(net):
 
     if buses_to_drop:
         pp.drop_buses(net, buses_to_drop)
+
+    # Ensure we still have a slack or generators
+    if net.ext_grid.empty and net.gen.empty:
+        raise ValueError("No slack/ext_grid or generator in the largest island; cannot run power flow.")
+
+    # --- Run DC Power Flow ---
+    pp.rundcpp(net)
+    print('DCPF converged:', net.converged)
+
+    # --- Run DC Optimal Power Flow ---
+    try:
+        pp.rundcopp(net)
+        print('DCOPF converged:', net.OPF_converged)
+    except Exception as e:
+        print('DCOPF failed to converge')
+        print('Error:', e)
 
     return net

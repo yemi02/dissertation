@@ -46,6 +46,8 @@ def map_to_lcoe_category(plant_type_str):
         return "CCGT"
     elif "ocgt" in pt:
         return "OCGT"
+    elif "oil" in pt:
+        return "Oil"
     elif "biomass" in pt or "thermal" in pt:
         return "Biomass"
     elif "energy storage" in pt or "battery storage" in pt or "storage" in pt:
@@ -123,6 +125,7 @@ def create_gens(net, NGET_bus_lookup, substation_group):
         "Pumped Storage": 40,
         "CCGT": 50,
         "OCGT": 55,
+        "Oil": 60,
         "Biomass": 45,
         "Other": 70,
         "Coal": 80,

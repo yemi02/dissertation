@@ -1,7 +1,5 @@
 import pandapower as pp
-import pandas as pd
 import warnings
-import os
 
 from elements.buses import create_buses
 from elements.lines import create_lines
@@ -9,7 +7,9 @@ from elements.transformers import create_transformers
 from elements.loads import create_loads, group_bus_by_substation
 from elements.generators import create_gens
 from elements.interconnectors import create_interconnectors
-from utilities.island_cleanup import keep_largest_island 
+from utilities.run_dc import run_dcopf 
+from tests.generation_summary import generation_summary
+from tests.get_network_results import get_results
 
 warnings.filterwarnings('ignore')
 
@@ -23,44 +23,20 @@ create_transformers(net, NGET_bus_lookup, SHE_BUS, SPT_BUS, OFTO_BUS)
 substation_group = group_bus_by_substation(NGET_bus_lookup)
 create_loads(net, NGET_bus_lookup, substation_group)
 create_gens(net, NGET_bus_lookup, substation_group)
-# create_interconnectors(net, NGET_bus_lookup, mode="import")
+create_interconnectors(net, NGET_bus_lookup, mode="import")
 
 # Slack Bus
 pp.create_ext_grid(net, SPT_BUS, vm_pu=1, name="SPT BUS")
 
-# Save Network for reference
-pp.to_excel(net, os.path.join("results", "network_v0.xlsx"))
-
-# --- Remove all but largest island ---
-net = keep_largest_island(net)
-
-
 # Apply load scaling
 net.load.loc[:, 'p_mw']
 
-# Ensure we still have a slack or generators
-if net.ext_grid.empty and net.gen.empty:
-    raise ValueError("No slack/ext_grid or generator in the largest island; cannot run power flow.")
+# Run DCPF and DCOPF
+run_dcopf(net)
 
-# --- Run DC Power Flow ---
-pp.rundcpp(net)
-print('DCPF converged:', net.converged)
+# Get network results and DCOPF results
+get_results(net)
 
-# --- Run DC Optimal Power Flow ---
-try:
-    pp.rundcopp(net)
-    print('DCOPF converged:', net.OPF_converged)
-except Exception as e:
-    print('DCOPF failed to converge')
-    print('Error:', e)
+# Generation summary
+generation_summary(net)
 
-# Ensure the results folder exists
-os.makedirs("results", exist_ok=True)
-
-# --- Save Results ---
-with pd.ExcelWriter(os.path.join("results", "dc_opf_results.xlsx")) as writer:
-    net.res_bus.to_excel(writer, sheet_name="Bus Results")
-    net.res_line.to_excel(writer, sheet_name="Line Results")
-    net.res_gen.to_excel(writer, sheet_name="Generator Results")
-    net.res_load.to_excel(writer, sheet_name="Load Results")
-    net.res_ext_grid.to_excel(writer, sheet_name="External Grid Results")
