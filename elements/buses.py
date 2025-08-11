@@ -36,5 +36,6 @@ def create_buses(net):
             bus_idx = pp.create_bus(net, vn_kv=400, name=bus)
             NGET_bus_lookup[bus] = bus_idx # Store in lookup table
 
+    print("Bus creation complete.")
     return SHE_BUS, SPT_BUS, OFTO_BUS, NGET_bus_lookup
 

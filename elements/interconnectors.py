@@ -25,7 +25,7 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
         "to_bus": france_1,
         "length_km": 73,
         "mode": "import",
-        "mw_flow": 1800  
+        "mw_flow": 1553  
     },
     "BritNed": {
         "capacity_mw": 1000,
@@ -33,7 +33,7 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
         "to_bus": netherlands,
         "length_km": 260,
         "mode": "import",
-        "mw_flow": 400
+        "mw_flow": 556
     },
     "East-West": {
         "capacity_mw": 500,
@@ -49,7 +49,7 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
         "to_bus": belgium,
         "length_km": 140,
         "mode": "import",
-        "mw_flow": 520
+        "mw_flow": 759
     },
     "IFA-2": {
         "capacity_mw": 1000,
@@ -57,7 +57,7 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
         "to_bus": france_2,
         "length_km": 204,
         "mode": "import",
-        "mw_flow": 910
+        "mw_flow": 777
     },
     "North Sea Link": {
         "capacity_mw": 1400,
@@ -65,7 +65,7 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
         "to_bus": norway,
         "length_km": 720,
         "mode": "import",
-        "mw_flow": 924
+        "mw_flow": 484
     },
     "ElecLink": {
         "capacity_mw": 1000,
@@ -73,7 +73,7 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
         "to_bus": france_3,
         "length_km": 51,
         "mode": "import",
-        "mw_flow": 996
+        "mw_flow": 778
     },
     "Viking Link": {
         "capacity_mw": 1400,
@@ -81,7 +81,7 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
         "to_bus": denmark,
         "length_km": 765,
         "mode": "import",
-        "mw_flow": 382
+        "mw_flow": 194
     },
     "Greenlink": {
         "capacity_mw": 500,
@@ -157,7 +157,7 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
             {
                 "c_nf_per_km": 0,    
                 "r_ohm_per_km": 0, 
-                "x_ohm_per_km": 0.2,  
+                "x_ohm_per_km": 0.05,  
                 "max_i_ka": ka_rating,
                 "g_us_per_km": 0,    
                 "type": "cs"        
@@ -177,3 +177,4 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
         )
 
     print("Interconnector creation complete.")
+    

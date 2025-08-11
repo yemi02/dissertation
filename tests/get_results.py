@@ -10,6 +10,7 @@ def get_results(net):
     # Save Network for reference
     pp.to_excel(net, os.path.join("results", "network_v0.xlsx"))
 
+
     # --- Save Results ---
     with pd.ExcelWriter(os.path.join("results", "dc_opf_results.xlsx")) as writer:
         net.res_bus.to_excel(writer, sheet_name="Bus Results")

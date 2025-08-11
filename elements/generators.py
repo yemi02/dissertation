@@ -46,6 +46,8 @@ def map_to_lcoe_category(plant_type_str):
         return "CCGT"
     elif "ocgt" in pt:
         return "OCGT"
+    elif "chp" in pt:
+        return "CHP"
     elif "oil" in pt:
         return "Oil"
     elif "biomass" in pt or "thermal" in pt:
@@ -119,18 +121,20 @@ def create_gens(net, NGET_bus_lookup, substation_group):
     # Fixed costs €/MWh
     fixed_costs = {
         "Wind": 10,
-        "Solar PV": 10,
+        "Solar PV": 15,
         "Nuclear": 20,
-        "Hydro": 30,
-        "Pumped Storage": 40,
+        "Hydro": 40,
+        "Pumped Storage": 65,
         "CCGT": 50,
-        "OCGT": 55,
-        "Oil": 60,
-        "Biomass": 45,
+        "OCGT": 60,
+        "CHP": 90,
+        "Oil": 55,
+        "Biomass": 35,
         "Other": 70,
         "Coal": 80,
-        "Battery Storage": 35
+        "Battery Storage": 65
     }
+
     final_matched["Fixed Cost"] = final_matched["LCOE Category"].map(fixed_costs).fillna(1000)
 
     # Clear old poly_cost

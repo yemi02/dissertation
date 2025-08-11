@@ -5,6 +5,11 @@ import warnings
 warnings.filterwarnings('ignore')
 
 def run_dcopf(net):
+    # Reduce the generation of Nuclear generators by half
+    nuclear_gens = net.gen[net.gen['name'].str.contains('Nuclear', case=False)].index
+    net.gen.loc[nuclear_gens, 'max_p_mw'] *= 0.5 
+
+
     # Create the networkx graph
     graph = ppt.create_nxgraph(net)
 

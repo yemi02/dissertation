@@ -9,6 +9,7 @@ def generation_summary(net):
     "Pumped Storage",
     "CCGT",
     "OCGT",
+    "CHP",
     "Biomass",
     "Other",
     "Coal",
@@ -24,7 +25,8 @@ def generation_summary(net):
     "Greenlink"
     ]
 
-    total_generation_mw = net.res_gen['p_mw'].sum() + net.res_ext_grid["p_mw"].sum()
+    external_grid_mw = net.res_ext_grid["p_mw"].sum()
+    total_generation_mw = net.res_gen['p_mw'].sum() + external_grid_mw
     total_load_mw = net.res_load["p_mw"].sum() 
     generation_by_type = {gen_type: 0.0 for gen_type in gen_types}
     generation_by_type['Unknown'] = 0.0
@@ -47,6 +49,7 @@ def generation_summary(net):
     print(f"Total load in network: {total_load_mw:.2f} MW")
     print(f"Total generation in network: {total_generation_mw:.2f} MW")
     print("Generation by type:")
+    print(f"  EXT_GRID: {external_grid_mw:.2f} MW" )
     for gen_type, total in generation_by_type.items():
         print(f"  {gen_type}: {total:.2f} MW")
 
