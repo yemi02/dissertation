@@ -18,8 +18,8 @@ def convert_mva_to_ka(mva_rating):
 
 # === Line Creation Function ===
 
-def create_lines(net, NGET_bus_lookup, SHE_BUS, SPT_BUS, OFTO_BUS):
-    df = pd.read_excel("ETYS_documents/ETYS_B.xlsx", sheet_name="B-2-1c", skiprows=1)
+def create_lines(net, NGET_bus_lookup, SHE_BUS, SPT_BUS, OFTO_BUS, network_file, line_sheet):
+    df = pd.read_excel(network_file, sheet_name=line_sheet, skiprows=1)
 
     for idx in df.index:
         from_bus_name = df.at[idx, "Node 1"]

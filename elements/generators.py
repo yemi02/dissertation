@@ -3,8 +3,6 @@ import pandas as pd
 from rapidfuzz import process, fuzz
 import re
 
-# Constants
-NETWORK_SHEETS = ["B-1-1a", "B-1-1b", "B-1-1c", "B-1-1d"]
 
 # -----------------
 # Helper Functions
@@ -63,24 +61,25 @@ def get_best_match(name, site_names_clean):
         return match[0], match[1]
     return None, 0
 
-def load_substations():
-    substations = []
-    for sheet in NETWORK_SHEETS:
-        sub_df = pd.read_excel("ETYS_documents/ETYS_B.xlsx", sheet_name=sheet, skiprows=1)
-        sub_df = sub_df.dropna(subset=["Site Name", "Site Code"]).copy()
-        sub_df["Cleaned Site"] = sub_df["Site Name"].apply(clean_name)
-        substations.append(sub_df[["Site Name", "Site Code", "Cleaned Site"]])
-    sub_df = pd.concat(substations, ignore_index=True)
-    sub_df = sub_df.drop_duplicates(subset=["Cleaned Site"])
-    return sub_df
 
 # -----------------
 # Main Generator Creation
 # -----------------
-def create_gens(net, NGET_bus_lookup, substation_group):
+def create_gens(net, NGET_bus_lookup, substation_group, gen_file, gen_sheet, network_file, substation_sheet):
+
+    def load_substations():
+        substations = []
+        for sheet in substation_sheet:
+            sub_df = pd.read_excel(network_file, sheet_name=sheet, skiprows=1)
+            sub_df = sub_df.dropna(subset=["Site Name", "Site Code"]).copy()
+            sub_df["Cleaned Site"] = sub_df["Site Name"].apply(clean_name)
+            substations.append(sub_df[["Site Name", "Site Code", "Cleaned Site"]])
+        sub_df = pd.concat(substations, ignore_index=True)
+        sub_df = sub_df.drop_duplicates(subset=["Cleaned Site"])
+        return sub_df
 
     # Load TEC Register
-    gen_df = pd.read_excel("ETYS_documents/ETYS_F.xlsx", sheet_name="TEC Register", skiprows=1)
+    gen_df = pd.read_excel(gen_file, sheet_name=gen_sheet, skiprows=1)
     gen_df = gen_df.dropna(subset=["Project Status", "HOST TO"])
     gen_df["Project Status"] = gen_df["Project Status"].str.strip().str.lower()
     gen_df["HOST TO"] = gen_df["HOST TO"].str.strip().str.upper()

@@ -4,8 +4,8 @@ from elements.substations import NGET_SUBSTATIONS, SHE_SUBSTATIONS, SPT_SUBSTATI
 
 # === Transformer Creation Function ===
 
-def create_transformers(net, NGET_bus_lookup, SHE_BUS, SPT_BUS, OFTO_BUS):
-    df = pd.read_excel("ETYS_documents/ETYS_B.xlsx", sheet_name="B-3-1c", skiprows=1)
+def create_transformers(net, NGET_bus_lookup, SHE_BUS, SPT_BUS, OFTO_BUS, network_file, transformer_sheet):
+    df = pd.read_excel(network_file, sheet_name=transformer_sheet, skiprows=1)
     for idx in df.index:
         from_bus_name = df.at[idx, "Node 1"]
         to_bus_name = df.at[idx, "Node 2"]

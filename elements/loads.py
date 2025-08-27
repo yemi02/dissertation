@@ -17,7 +17,7 @@ def group_bus_by_substation(NGET_bus_lookup):
 
 # === Load Creation Function ===
 
-def create_loads(net, NGET_bus_lookup, substation_group):
+def create_loads(net, NGET_bus_lookup, substation_group, demand_file, load_sheet):
 
     # === Initialize accumulators and containers ===
 
@@ -36,7 +36,7 @@ def create_loads(net, NGET_bus_lookup, substation_group):
     total_OFTO_load = 0
     
 
-    df = pd.read_excel("ETYS_documents/ETYS_G.xlsx", sheet_name="demand data 2023", skiprows=9)
+    df = pd.read_excel(demand_file, sheet_name=load_sheet, skiprows=9)
     for idx in df.index:
         bus = df.at[idx, "Node"]
         substation = bus[:4]
