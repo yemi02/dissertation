@@ -25,7 +25,7 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
         "to_bus": france_1,
         "length_km": 73,
         "mode": "import",
-        "mw_flow": 1553  
+        "mw_flow": 1504  
     },
     "BritNed": {
         "capacity_mw": 1000,
@@ -33,15 +33,15 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
         "to_bus": netherlands,
         "length_km": 260,
         "mode": "import",
-        "mw_flow": 556
+        "mw_flow": 783
     },
     "East-West": {
         "capacity_mw": 500,
         "from_bus": "FLIB",
         "to_bus": ireland_1,
         "length_km": 261,
-        "mode": "import",
-        "mw_flow": 0
+        "mode": "export",
+        "mw_flow": 500
     },
     "Nemo Link": {
         "capacity_mw": 1000,
@@ -49,7 +49,7 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
         "to_bus": belgium,
         "length_km": 140,
         "mode": "import",
-        "mw_flow": 759
+        "mw_flow": 23
     },
     "IFA-2": {
         "capacity_mw": 1000,
@@ -57,7 +57,7 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
         "to_bus": france_2,
         "length_km": 204,
         "mode": "import",
-        "mw_flow": 777
+        "mw_flow": 992
     },
     "North Sea Link": {
         "capacity_mw": 1400,
@@ -65,7 +65,7 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
         "to_bus": norway,
         "length_km": 720,
         "mode": "import",
-        "mw_flow": 484
+        "mw_flow": 1399
     },
     "ElecLink": {
         "capacity_mw": 1000,
@@ -73,7 +73,7 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
         "to_bus": france_3,
         "length_km": 51,
         "mode": "import",
-        "mw_flow": 778
+        "mw_flow": 996
     },
     "Viking Link": {
         "capacity_mw": 1400,
@@ -81,15 +81,15 @@ def create_interconnectors(net, NGET_bus_lookup, mode="import"):
         "to_bus": denmark,
         "length_km": 765,
         "mode": "import",
-        "mw_flow": 194
+        "mw_flow": 368
     },
     "Greenlink": {
         "capacity_mw": 500,
         "from_bus": "PEMB",
         "to_bus": ireland_2,
         "length_km": 190,
-        "mode": "import",
-        "mw_flow": 0
+        "mode": "export",
+        "mw_flow": 452
     },
     }
     
