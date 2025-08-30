@@ -50,18 +50,18 @@ net.gen.loc[net.gen["name"].str.contains("Wind|Solar PV"), "p_mw"] *= 1.1
 
 # Run DCOPF and get network results with DCOPF results
 run_dcopf(net)
-# get_results(net)
+get_results(net)
 
 # # Generation summary
 generation_summary(net)
 
 # N-1 Security on network
-# secure_scale, violations = n1_security(net, step=0.01, max_scale=2.0, include_impedances=True)
+secure_scale, violations = n1_security(net, step=0.01, max_scale=2.0, include_impedances=True)
 
-# print(f"Maximum secure load multiplier: {secure_scale:.2f}x base")
-# if not violations.empty:
-#     print("Violations at failure step:")
-#     print(violations.sort_values("max_loading_percent", ascending=False).head(10))
+print(f"Maximum secure load multiplier: {secure_scale:.2f}x base")
+if not violations.empty:
+    print("Violations at failure step:")
+    print(violations.sort_values("max_loading_percent", ascending=False).head(10))
 
 # Network topology plot
-# plot_network(net)
+plot_network(net)
